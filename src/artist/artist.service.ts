@@ -3,7 +3,7 @@ import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { v4 as uuid } from 'uuid';
 import { Artist } from '../interfaces/artist';
-import artistDB from '../db/artist';
+import db from '../db/db';
 
 @Injectable()
 export class ArtistService {
@@ -15,13 +15,13 @@ export class ArtistService {
       ...createArtistDto,
     };
 
-    artistDB.set(id, artist);
+    db.artist.set(id, artist);
 
     return this.findOne(id);
   }
 
   findAll() {
-    return [...artistDB.values()];
+    return [...db.artist.values()];
   }
 
   findAllByIds(ids: string[]) {
@@ -29,7 +29,7 @@ export class ArtistService {
   }
 
   findOne(id: string) {
-    return artistDB.get(id);
+    return db.artist.get(id);
   }
 
   update(artist: Artist, updateArtistDto: UpdateArtistDto) {
@@ -38,12 +38,14 @@ export class ArtistService {
       id: artist.id,
     };
 
-    artistDB.set(artist.id, updatedArtist);
+    db.artist.set(artist.id, updatedArtist);
 
     return updatedArtist;
   }
 
   remove(artist: Artist) {
-    return artistDB.delete(artist.id);
+    if (db.artist.delete(artist.id)) {
+      db.favs.artists.delete(artist.id);
+    }
   }
 }

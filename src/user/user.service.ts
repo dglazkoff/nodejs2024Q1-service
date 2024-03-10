@@ -1,9 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
-import userDB from '../db/user';
 import { User } from '../interfaces/user';
 import { v4 as uuid } from 'uuid';
+import db from '../db/db';
 
 @Injectable()
 export class UserService {
@@ -18,18 +18,18 @@ export class UserService {
       ...createUserDto,
     };
 
-    userDB.set(id, user);
+    db.user.set(id, user);
 
     return this.getOne(id);
   }
 
   findAll() {
-    return [...userDB.values()];
+    return [...db.user.values()];
   }
 
   // TODO: добавить @Exclude на пароль когда подключим typeorm
   getOne(id: string) {
-    const user = userDB.get(id);
+    const user = db.user.get(id);
 
     if (!user) {
       return;
@@ -41,7 +41,7 @@ export class UserService {
   }
 
   findOne(id: string) {
-    return userDB.get(id);
+    return db.user.get(id);
   }
 
   updatePassword(user: User, updateUserPasswordDto: UpdateUserPasswordDto) {
@@ -49,7 +49,7 @@ export class UserService {
       return;
     }
 
-    userDB.set(user.id, {
+    db.user.set(user.id, {
       ...user,
       password: updateUserPasswordDto.newPassword,
       updatedAt: new Date().getTime(),
@@ -60,6 +60,6 @@ export class UserService {
   }
 
   remove(id: string) {
-    return userDB.delete(id);
+    return db.user.delete(id);
   }
 }

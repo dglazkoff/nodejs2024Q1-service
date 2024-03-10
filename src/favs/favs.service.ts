@@ -1,41 +1,41 @@
 import { Injectable } from '@nestjs/common';
-import favsDB from '../db/favs';
+import db from '../db/db';
 
 @Injectable()
 export class FavsService {
   getAlbums() {
-    return [...favsDB.albums];
+    return [...db.favs.albums];
   }
 
   getTracks() {
-    return [...favsDB.tracks];
+    return [...db.favs.tracks];
   }
 
   getArtists() {
-    return [...favsDB.artists];
+    return [...db.favs.artists];
   }
 
   createTrack(id: string) {
-    favsDB.tracks.add(id);
+    db.favs.tracks.add(id);
   }
 
   removeTrack(id: string) {
-    return favsDB.tracks.delete(id);
+    return db.favs.tracks.delete(id);
   }
 
   createAlbum(id: string) {
-    favsDB.albums.add(id);
+    db.favs.albums.add(id);
   }
 
   removeAlbum(id: string) {
-    return favsDB.albums.delete(id);
+    return db.favs.albums.delete(id);
   }
 
   createArtist(id: string) {
-    favsDB.artists.add(id);
+    db.favs.artists.add(id);
   }
 
   removeArtist(id: string) {
-    return favsDB.artists.delete(id);
+    return db.favs.artists.delete(id);
   }
 }

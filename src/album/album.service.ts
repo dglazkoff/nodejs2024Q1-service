@@ -3,8 +3,7 @@ import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { v4 as uuid } from 'uuid';
 import { Album } from '../interfaces/album';
-import albumDB from '../db/album';
-import trackDB from '../db/track';
+import db from '../db/db';
 
 @Injectable()
 export class AlbumService {
@@ -16,13 +15,13 @@ export class AlbumService {
       ...createAlbumDto,
     };
 
-    albumDB.set(id, album);
+    db.album.set(id, album);
 
     return this.findOne(id);
   }
 
   findAll() {
-    return [...albumDB.values()];
+    return [...db.album.values()];
   }
 
   findAllByIds(ids: string[]) {
@@ -30,7 +29,7 @@ export class AlbumService {
   }
 
   findOne(id: string) {
-    return albumDB.get(id);
+    return db.album.get(id);
   }
 
   update(album: Album, updateAlbumDto: UpdateAlbumDto) {
@@ -39,19 +38,21 @@ export class AlbumService {
       id: album.id,
     };
 
-    albumDB.set(album.id, updatedAlbum);
+    db.album.set(album.id, updatedAlbum);
 
     return updatedAlbum;
   }
 
   remove(album: Album) {
-    return albumDB.delete(album.id);
+    if (db.album.delete(album.id)) {
+      db.favs.albums.delete(album.id);
+    }
   }
 
   removeArtist(artistId: string) {
-    for (const album of albumDB.values()) {
+    for (const album of db.album.values()) {
       if (album.artistId === artistId) {
-        albumDB.set(album.id, { ...album, artistId: null });
+        db.album.set(album.id, { ...album, artistId: null });
       }
     }
   }

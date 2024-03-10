@@ -9,5 +9,6 @@ import { AlbumModule } from '../album/album.module';
   controllers: [FavsController],
   providers: [FavsService],
   imports: [TrackModule, ArtistModule, AlbumModule],
+  exports: [FavsService],
 })
 export class FavsModule {}
