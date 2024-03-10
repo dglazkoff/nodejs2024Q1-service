@@ -1,5 +1,9 @@
+import { IsBoolean, IsString } from 'class-validator';
+
 export class CreateArtistDto {
+  @IsString()
   name: string;
-  year: number;
-  artistId: string | null;
+
+  @IsBoolean()
+  grammy: boolean;
 }

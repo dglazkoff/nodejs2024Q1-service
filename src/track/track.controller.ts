@@ -15,7 +15,6 @@ import {
 import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { UserPipe } from '../user/user.pipe';
 import { TrackPipe } from './track.pipe';
 import { Track } from '../interfaces/track';
 

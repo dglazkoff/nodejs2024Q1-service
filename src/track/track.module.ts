@@ -6,5 +6,6 @@ import { UserModule } from '../user/user.module';
 @Module({
   controllers: [TrackController],
   providers: [TrackService],
+  exports: [TrackService],
 })
 export class TrackModule {}

@@ -12,6 +12,7 @@ export class TrackService {
   create(createTrackDto: CreateTrackDto) {
     const id = uuid();
 
+    // проверять что есть такой артист и альбом ?
     const track: Track = {
       id,
       ...createTrackDto,
@@ -24,6 +25,10 @@ export class TrackService {
 
   findAll() {
     return [...trackDB.values()];
+  }
+
+  findAllByIds(ids: string[]) {
+    return ids.map((id) => this.findOne(id)).filter(Boolean);
   }
 
   findOne(id: string) {
@@ -43,5 +48,21 @@ export class TrackService {
 
   remove(track: Track) {
     return trackDB.delete(track.id);
+  }
+
+  removeArtist(artistId: string) {
+    for (const track of trackDB.values()) {
+      if (track.artistId === artistId) {
+        trackDB.set(track.id, { ...track, artistId: null });
+      }
+    }
+  }
+
+  removeAlbum(albumId: string) {
+    for (const track of trackDB.values()) {
+      if (track.albumId === albumId) {
+        trackDB.set(track.id, { ...track, albumId: null });
+      }
+    }
   }
 }
