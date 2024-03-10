@@ -18,6 +18,9 @@ components:
         login:
           type: string
           example: 'TestUser'
+        password:
+          type: string
+          example: '12345'
         version:
           type: number
           example: 1
@@ -30,6 +33,10 @@ components:
       required:
         - id
         - login
+        - password
+        - version
+        - createAt
+        - updateAt
     Artist:
       type: object
       properties:
@@ -45,6 +52,7 @@ components:
       required:
         - id
         - name
+        - grammy
     Album:
       type: object
       properties:
@@ -64,6 +72,7 @@ components:
       required:
         - id
         - name
+        - year
     Track:
       type: object
       properties:
