@@ -7,7 +7,6 @@ import db from '../db/db';
 
 @Injectable()
 export class UserService {
-  // надо проверять что такой юзер уже есть??
   create(createUserDto: CreateUserDto) {
     const id = uuid();
     const user: User = {

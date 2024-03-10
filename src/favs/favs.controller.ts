@@ -51,9 +51,6 @@ export class FavsController {
     }
   }
 
-  // как-то можно избавиться от дублирования?
-  // как-то сделать проверку на существование альбома и артиста в одном месте?
-
   @Post('album/:id')
   createAlbum(@Param('id', ParseUUIDPipe) id: string) {
     if (this.albumService.findOne(id)) {
