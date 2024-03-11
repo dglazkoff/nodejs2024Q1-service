@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { v4 as uuid } from 'uuid';
@@ -9,6 +9,16 @@ import db from '../db/db';
 export class TrackService {
   create(createTrackDto: CreateTrackDto) {
     const id = uuid();
+
+    // FIXME: remove after adding typeorm
+    if (createTrackDto.albumId && !db.album.has(createTrackDto.albumId)) {
+      throw new HttpException('Album not found', HttpStatus.BAD_REQUEST);
+    }
+
+    // FIXME: remove after adding typeorm
+    if (createTrackDto.artistId && !db.artist.has(createTrackDto.artistId)) {
+      throw new HttpException('Artist not found', HttpStatus.BAD_REQUEST);
+    }
 
     const track: Track = {
       id,

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { v4 as uuid } from 'uuid';
@@ -9,6 +9,11 @@ import db from '../db/db';
 export class AlbumService {
   create(createAlbumDto: CreateAlbumDto) {
     const id = uuid();
+
+    // FIXME: remove after adding typeorm
+    if (createAlbumDto.artistId && !db.artist.has(createAlbumDto.artistId)) {
+      throw new HttpException('Artist not found', HttpStatus.BAD_REQUEST);
+    }
 
     const album: Album = {
       id,
@@ -46,7 +51,10 @@ export class AlbumService {
   remove(album: Album) {
     if (db.album.delete(album.id)) {
       db.favs.albums.delete(album.id);
+      return true;
     }
+
+    return false;
   }
 
   removeArtist(artistId: string) {

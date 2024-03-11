@@ -46,6 +46,9 @@ export class ArtistService {
   remove(artist: Artist) {
     if (db.artist.delete(artist.id)) {
       db.favs.artists.delete(artist.id);
+      return true;
     }
+
+    return false;
   }
 }
