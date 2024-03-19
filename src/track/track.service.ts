@@ -1,77 +1,38 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { v4 as uuid } from 'uuid';
-import { Track } from '../interfaces/track';
-import db from '../db/db';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Track } from './entities/track.entity';
 
 @Injectable()
 export class TrackService {
-  create(createTrackDto: CreateTrackDto) {
-    const id = uuid();
+  constructor(
+    @InjectRepository(Track)
+    private trackRepository: Repository<Track>,
+  ) {}
+  async create(createTrackDto: CreateTrackDto) {
+    // // trackRepository will throw error if no artist or album with such id
+    const track = this.trackRepository.create(createTrackDto);
 
-    // FIXME: remove after adding typeorm
-    if (createTrackDto.albumId && !db.album.has(createTrackDto.albumId)) {
-      throw new HttpException('Album not found', HttpStatus.BAD_REQUEST);
-    }
-
-    // FIXME: remove after adding typeorm
-    if (createTrackDto.artistId && !db.artist.has(createTrackDto.artistId)) {
-      throw new HttpException('Artist not found', HttpStatus.BAD_REQUEST);
-    }
-
-    const track: Track = {
-      id,
-      ...createTrackDto,
-    };
-
-    db.track.set(id, track);
-
-    return this.findOne(id);
+    return this.trackRepository.save(track);
   }
 
-  findAll() {
-    return [...db.track.values()];
+  async findAll() {
+    return this.trackRepository.find();
   }
 
-  findAllByIds(ids: string[]) {
-    return ids.map((id) => this.findOne(id)).filter(Boolean);
+  async findOne(id: string) {
+    return this.trackRepository.findOneBy({ id });
   }
 
-  findOne(id: string) {
-    return db.track.get(id);
+  async update(track: Track, updateTrackDto: UpdateTrackDto) {
+    this.trackRepository.merge(track, updateTrackDto);
+
+    return this.trackRepository.save(track);
   }
 
-  update(track: Track, updateTrackDto: UpdateTrackDto) {
-    const updatedTrack = {
-      ...updateTrackDto,
-      id: track.id,
-    };
-
-    db.track.set(track.id, updatedTrack);
-
-    return updatedTrack;
-  }
-
-  remove(track: Track) {
-    if (db.track.delete(track.id)) {
-      db.favs.tracks.delete(track.id);
-    }
-  }
-
-  removeArtist(artistId: string) {
-    for (const track of db.track.values()) {
-      if (track.artistId === artistId) {
-        db.track.set(track.id, { ...track, artistId: null });
-      }
-    }
-  }
-
-  removeAlbum(albumId: string) {
-    for (const track of db.track.values()) {
-      if (track.albumId === albumId) {
-        db.track.set(track.id, { ...track, albumId: null });
-      }
-    }
+  async remove(track: Track) {
+    return this.trackRepository.delete(track.id);
   }
 }

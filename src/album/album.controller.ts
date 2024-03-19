@@ -16,40 +16,31 @@ import { AlbumService } from './album.service';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { AlbumPipe } from './album.pipe';
-import { Album } from '../interfaces/album';
-import { TrackService } from '../track/track.service';
+import { Album } from './entities/album.entity';
 
 @Controller('album')
 export class AlbumController {
-  constructor(
-    private readonly albumService: AlbumService,
-    private readonly trackService: TrackService,
-  ) {}
+  constructor(private readonly albumService: AlbumService) {}
 
   @Post()
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-    }),
-  )
-  create(@Body() createAlbumDto: CreateAlbumDto) {
+  @UsePipes(ValidationPipe)
+  async create(@Body() createAlbumDto: CreateAlbumDto) {
     return this.albumService.create(createAlbumDto);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.albumService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe, AlbumPipe) album: Album) {
+  async findOne(@Param('id', ParseUUIDPipe, AlbumPipe) album: Album) {
     return album;
   }
 
   @Put(':id')
-  @UsePipes(new ValidationPipe())
-  update(
+  @UsePipes(ValidationPipe)
+  async update(
     @Param('id', ParseUUIDPipe, AlbumPipe) album: Album,
     @Body() updateAlbumDto: UpdateAlbumDto,
   ) {
@@ -58,9 +49,7 @@ export class AlbumController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe, AlbumPipe) album: Album) {
-    if (this.albumService.remove(album)) {
-      this.trackService.removeAlbum(album.id);
-    }
+  async remove(@Param('id', ParseUUIDPipe, AlbumPipe) album: Album) {
+    return this.albumService.remove(album);
   }
 }

@@ -1,67 +1,39 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
-import { v4 as uuid } from 'uuid';
-import { Album } from '../interfaces/album';
-import db from '../db/db';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Album } from './entities/album.entity';
 
 @Injectable()
 export class AlbumService {
-  create(createAlbumDto: CreateAlbumDto) {
-    const id = uuid();
+  constructor(
+    @InjectRepository(Album)
+    private albumRepository: Repository<Album>,
+  ) {}
 
-    // FIXME: remove after adding typeorm
-    if (createAlbumDto.artistId && !db.artist.has(createAlbumDto.artistId)) {
-      throw new HttpException('Artist not found', HttpStatus.BAD_REQUEST);
-    }
+  async create(createAlbumDto: CreateAlbumDto) {
+    const album = this.albumRepository.create(createAlbumDto);
 
-    const album: Album = {
-      id,
-      ...createAlbumDto,
-    };
-
-    db.album.set(id, album);
-
-    return this.findOne(id);
+    // albumRepository will throw error if no artist with such id
+    return this.albumRepository.save(album);
   }
 
-  findAll() {
-    return [...db.album.values()];
+  async findAll() {
+    return this.albumRepository.find();
   }
 
-  findAllByIds(ids: string[]) {
-    return ids.map((id) => this.findOne(id)).filter(Boolean);
-  }
-
-  findOne(id: string) {
-    return db.album.get(id);
+  async findOne(id: string) {
+    return this.albumRepository.findOneBy({ id });
   }
 
   update(album: Album, updateAlbumDto: UpdateAlbumDto) {
-    const updatedAlbum = {
-      ...updateAlbumDto,
-      id: album.id,
-    };
+    this.albumRepository.merge(album, updateAlbumDto);
 
-    db.album.set(album.id, updatedAlbum);
-
-    return updatedAlbum;
+    return this.albumRepository.save(album);
   }
 
   remove(album: Album) {
-    if (db.album.delete(album.id)) {
-      db.favs.albums.delete(album.id);
-      return true;
-    }
-
-    return false;
-  }
-
-  removeArtist(artistId: string) {
-    for (const album of db.album.values()) {
-      if (album.artistId === artistId) {
-        db.album.set(album.id, { ...album, artistId: null });
-      }
-    }
+    return this.albumRepository.delete(album.id);
   }
 }

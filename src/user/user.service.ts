@@ -1,64 +1,47 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
-import { User } from '../interfaces/user';
-import { v4 as uuid } from 'uuid';
-import db from '../db/db';
+import { User } from './entity/user.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    const id = uuid();
-    const user: User = {
-      id,
-      version: 1,
-      createdAt: new Date().getTime(),
-      updatedAt: new Date().getTime(),
-      ...createUserDto,
-    };
+  constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+  ) {}
 
-    db.user.set(id, user);
+  async create(createUserDto: CreateUserDto) {
+    const user = this.usersRepository.create(createUserDto);
 
-    return this.getOne(id);
+    return this.usersRepository.save(user);
   }
 
-  findAll() {
-    return [...db.user.values()];
+  async findAll() {
+    return this.usersRepository.find();
   }
 
-  // TODO: добавить @Exclude на пароль когда подключим typeorm
-  getOne(id: string) {
-    const user = db.user.get(id);
-
-    if (!user) {
-      return;
-    }
-
-    const { password, ...userRest } = user;
-
-    return userRest;
+  async findOne(id: string) {
+    return this.usersRepository.findOneBy({ id });
   }
 
-  findOne(id: string) {
-    return db.user.get(id);
-  }
-
-  updatePassword(user: User, updateUserPasswordDto: UpdateUserPasswordDto) {
+  async updatePassword(
+    user: User,
+    updateUserPasswordDto: UpdateUserPasswordDto,
+  ) {
     if (user.password !== updateUserPasswordDto.oldPassword) {
       return;
     }
 
-    db.user.set(user.id, {
-      ...user,
+    this.usersRepository.merge(user, {
       password: updateUserPasswordDto.newPassword,
-      updatedAt: new Date().getTime(),
-      version: user.version + 1,
     });
 
-    return this.getOne(user.id);
+    return this.usersRepository.save(user);
   }
 
-  remove(id: string) {
-    return db.user.delete(id);
+  async remove(id: string) {
+    return this.usersRepository.delete(id);
   }
 }

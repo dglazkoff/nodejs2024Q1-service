@@ -10,85 +10,89 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { FavsService } from './favs.service';
-import { AlbumService } from '../album/album.service';
-import { TrackService } from '../track/track.service';
-import { ArtistService } from '../artist/artist.service';
 
 @Controller('favs')
 export class FavsController {
-  constructor(
-    private readonly favsService: FavsService,
-    private readonly albumService: AlbumService,
-    private readonly trackService: TrackService,
-    private readonly artistService: ArtistService,
-  ) {}
+  constructor(private readonly favsService: FavsService) {}
 
   @Get()
-  findAll() {
+  async findAll() {
     return {
-      albums: this.albumService.findAllByIds(this.favsService.getAlbums()),
-      tracks: this.trackService.findAllByIds(this.favsService.getTracks()),
-      artists: this.artistService.findAllByIds(this.favsService.getArtists()),
+      albums: await this.favsService.getAlbums(),
+      artists: await this.favsService.getArtists(),
+      tracks: await this.favsService.getTracks(),
     };
   }
 
   @Post('track/:id')
-  createTrack(@Param('id', ParseUUIDPipe) id: string) {
-    if (this.trackService.findOne(id)) {
-      return this.favsService.createTrack(id);
+  async createTrack(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      await this.favsService.createTrack(id);
+    } catch (e) {
+      throw new HttpException(
+        'Album not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
-
-    throw new HttpException('Track not found', HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeTrack(@Param('id', ParseUUIDPipe) id: string) {
-    const isRemoved = this.favsService.removeTrack(id);
+  async removeTrack(@Param('id', ParseUUIDPipe) id: string) {
+    // const isRemoved = this.favsService.removeTrack(id);
+    //
+    // if (!isRemoved) {
+    //   throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
+    // }
 
-    if (!isRemoved) {
-      throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
-    }
+    return this.favsService.removeTrack(id);
   }
 
   @Post('album/:id')
-  createAlbum(@Param('id', ParseUUIDPipe) id: string) {
-    if (this.albumService.findOne(id)) {
-      return this.favsService.createAlbum(id);
+  async createAlbum(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      await this.favsService.createAlbum(id);
+    } catch (e) {
+      throw new HttpException(
+        'Album not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
-
-    throw new HttpException('Album not found', HttpStatus.UNPROCESSABLE_ENTITY);
   }
 
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
-    const isRemoved = this.favsService.removeAlbum(id);
+  async removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
+    // const isRemoved = this.favsService.removeAlbum(id);
+    //
+    // if (!isRemoved) {
+    //   throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
+    // }
 
-    if (!isRemoved) {
-      throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
-    }
+    return this.favsService.removeAlbum(id);
   }
 
   @Post('artist/:id')
-  createArtist(@Param('id', ParseUUIDPipe) id: string) {
-    if (this.artistService.findOne(id)) {
-      return this.favsService.createArtist(id);
+  async createArtist(@Param('id', ParseUUIDPipe) id: string) {
+    try {
+      await this.favsService.createArtist(id);
+    } catch (e) {
+      throw new HttpException(
+        'Artist not found',
+        HttpStatus.UNPROCESSABLE_ENTITY,
+      );
     }
-
-    throw new HttpException(
-      'Artist not found',
-      HttpStatus.UNPROCESSABLE_ENTITY,
-    );
   }
 
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   removeArtist(@Param('id', ParseUUIDPipe) id: string) {
-    const isRemoved = this.favsService.removeArtist(id);
+    // const isRemoved = this.favsService.removeArtist(id);
+    //
+    // if (!isRemoved) {
+    //   throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
+    // }
 
-    if (!isRemoved) {
-      throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
-    }
+    return this.favsService.removeArtist(id);
   }
 }
