@@ -4,9 +4,6 @@ info:
   description: Home music library service
   version: 1.0.0
 
-servers:
-  - url: /api
-
 components:
   schemas:
     User:
@@ -15,9 +12,14 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         login:
           type: string
           example: 'TestUser'
+        password:
+          type: string
+          example: '12345'
+          writeOnly: true
         version:
           type: number
           example: 1
@@ -30,12 +32,17 @@ components:
       required:
         - id
         - login
+        - password
+        - version
+        - createAt
+        - updateAt
     Artist:
       type: object
       properties:
         id:
           type: string
           format: uuid
+          readOnly: true
         name:
           type: string
           example: 'Freddie Mercury'
@@ -45,12 +52,14 @@ components:
       required:
         - id
         - name
+        - grammy
     Album:
       type: object
       properties:
         id:
           type: string
           format: uuid
+          readOnly: true
         name:
           type: string
           example: 'Innuendo'
@@ -64,12 +73,14 @@ components:
       required:
         - id
         - name
+        - year
     Track:
       type: object
       properties:
         id:
           type: string
           format: uuid
+          readOnly: true
         name:
           type: string
           example: The Show Must Go On
@@ -189,7 +200,7 @@ paths:
           description: Bad request
         409:
           description: Conflict. Login already exists
-  /users:
+  /user:
     get:
       tags:
         - Users
@@ -239,7 +250,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /users/{userId}:
+  /user/{userId}:
     parameters:
       - name: userId
         in: path
@@ -293,24 +304,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                title: example
-                properties:
-                  id:
-                    type: string
-                    format: uuid
-                  login:
-                    type: string
-                    example: TestUser
-                  version:
-                    type: integer
-                    example: 2
-                  createAt:
-                    type: integer
-                    example: 1655000000
-                  updateAt:
-                    type: integer
-                    example: 1655999999
+                $ref: '#/components/schemas/User'
         400:
           description: Bad request. userId is invalid (not uuid)
         401:
@@ -334,7 +328,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: User not found
-  /tracks:
+  /track:
     get:
       tags:
         - Track
@@ -361,22 +355,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                artistId:
-                  type: string
-                  format: uuid
-                albumId:
-                  type: string
-                  format: uuid
-                duration:
-                  type: integer
-                  description: In seconds
-              required:
-                - name
-                - duration
+              $ref: '#/components/schemas/Track'
       responses:
         201:
           description: Successful operation
@@ -388,7 +367,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /tracks/{id}:
+  /track/{id}:
     parameters:
       - name: id
         in: path
@@ -424,54 +403,14 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              title: example
-              properties:
-                name:
-                  type: string
-                  example: Bohemian Rhapsody
-                artistId:
-                  type: string
-                  format: uuid
-                  nullable: true
-                duration:
-                  type: integer
-                  description: In seconds
-                  example: 355
-                albumId:
-                  type: string
-                  format: uuid
-                  nullable: true
-              required:
-                - name
-                - duration
+              $ref: '#/components/schemas/Track'
       responses:
         200:
           description: The track has been updated.
           content:
             application/json:
               schema:
-                type: object
-                title: example
-                properties:
-                  id:
-                    type: string
-                    format: uuid
-                  name:
-                    type: string
-                    example: Bohemian Rhapsody
-                  artistId:
-                    type: string
-                    format: uuid
-                    nullable: true
-                  duration:
-                    type: integer
-                    description: In seconds
-                    example: 355
-                  albumId:
-                    type: string
-                    format: uuid
-                    nullable: true
+                $ref: '#/components/schemas/Track'
         400:
           description: Bad request. trackId is invalid (not uuid)
         401:
@@ -492,7 +431,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Track was not found.
-  /albums:
+  /album:
     get:
       tags:
         - Album
@@ -519,20 +458,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              title: example
-              properties:
-                name:
-                  type: string
-                year:
-                  type: integer
-                artistId:
-                  type: string
-                  format: uuid
-                  nullable: true
-              required:
-                - name
-                - year
+              $ref: '#/components/schemas/Album'
       responses:
         201:
           description: Album is created
@@ -544,7 +470,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /albums/{id}:
+  /album/{id}:
     parameters:
       - name: id
         in: path
@@ -580,20 +506,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              title: example
-              properties:
-                name:
-                  type: string
-                year:
-                  type: integer
-                artistId:
-                  type: string
-                  format: uuid
-                  nullable: true
-              required:
-                - name
-                - year
+              $ref: '#/components/schemas/Album'
       responses:
         200:
           description: The album has been updated.
@@ -621,7 +534,7 @@ paths:
           $ref: '#/components/responses/UnauthorizedError'
         404:
           description: Album was not found.
-  /artists:
+  /artist:
     get:
       tags:
         - Artist
@@ -648,15 +561,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                grammy:
-                  type: boolean
-              required:
-                - name
-                - grammy
+              $ref: '#/components/schemas/Artist'
       responses:
         201:
           description: Successful operation
@@ -668,7 +573,7 @@ paths:
           description: Bad request. body does not contain required fields
         401:
           $ref: '#/components/responses/UnauthorizedError'
-  /artists/{id}:
+  /artist/{id}:
     parameters:
       - name: id
         in: path
@@ -704,15 +609,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
-                grammy:
-                  type: boolean
-              required:
-                - name
-                - grammy
+              $ref: '#/components/schemas/Artist'
       responses:
         200:
           description: The artist has been updated.

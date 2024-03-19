@@ -19,6 +19,9 @@ npm install
 
 ## Running application
 
+Before running the application, you need to set up the environment variables.
+Create a `.env` file in the root directory and fill it with the content from .env.example file.
+
 ```
 npm start
 ```
