@@ -3,29 +3,45 @@
 version: '3.8'
 
 services:
-#  app:
-#    image: node:20-alpine
+  server:
+    build:
+      context: .
 #    command: sh -c "npm run start:dev"
-#    ports:
-#      - '4000:4000'
-#    working_dir: /app
-#    volumes:
-#      - ./:/app
-#    environment:
-#      DB_PASSWORD: secret
-#      MYSQL_USER: root
-#      MYSQL_PASSWORD: secret
-#      MYSQL_DB: todos
+    # связываем порты внутри контейнера с портом снаружи. как прокидывать порт переменной окружения?
+    ports:
+      - '4000:4000'
+    # это мы связываем локальную директорию с той, в которую будет скопировано приложение
+    volumes:
+      - ./src:/usr/src/app/src
+    environment:
+      DB_PASSWORD: secret
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_DB: home-library
+#    depends_on:
+#      db:
+#        condition: service_healthy
   db:
     image: postgres:alpine
-    # restart: always - зачем?
+    user: postgres
 #    volumes:
-#      - todo-mysql-data:/var/lib/mysql
+#      - db-data:/var/lib/postgresql/data
+    # restart: always - зачем?
     environment:
       POSTGRES_PASSWORD: secret
       POSTGRES_DB: home-library
-    ports:
-      - '5432:5432'
+#    expose:
+#      - 5432
+#    ports:
+#      - '5432:5432'
+#    healthcheck:
+#      test: [ "CMD", "pg_isready" ]
+#      interval: 10s
+#      timeout: 5s
+#      retries: 5
+
+#volumes:
+#  db-data:
 
 #volumes:
 #  todo-mysql-data:
