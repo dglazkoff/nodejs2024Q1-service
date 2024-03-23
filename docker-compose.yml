@@ -1,0 +1,31 @@
+# custom network!
+# docker ignore!
+version: '3.8'
+
+services:
+#  app:
+#    image: node:20-alpine
+#    command: sh -c "npm run start:dev"
+#    ports:
+#      - '4000:4000'
+#    working_dir: /app
+#    volumes:
+#      - ./:/app
+#    environment:
+#      DB_PASSWORD: secret
+#      MYSQL_USER: root
+#      MYSQL_PASSWORD: secret
+#      MYSQL_DB: todos
+  db:
+    image: postgres:alpine
+    # restart: always - зачем?
+#    volumes:
+#      - todo-mysql-data:/var/lib/mysql
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: home-library
+    ports:
+      - '5432:5432'
+
+#volumes:
+#  todo-mysql-data:

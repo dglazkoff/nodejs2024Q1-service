@@ -20,7 +20,7 @@ import 'dotenv/config';
       host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: process.env.BD_PASSWORD,
+      password: 'secret',
       database: 'home-library',
       //  shouldn't be used in production
       synchronize: true,
