@@ -8,6 +8,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import 'dotenv/config';
 
+console.log(process.env.POSTGRES_HOST);
+
 @Module({
   imports: [
     UserModule,
