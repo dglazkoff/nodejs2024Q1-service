@@ -50,6 +50,14 @@ To stop the application in Docker, you need to enter the following command:
 npm run docker:stop
 ```
 
+## Vulnerabilities scanning
+
+To scan the application for vulnerabilities, you need to enter the following command:
+
+```
+npm run docker:scan
+```
+
 ## Testing
 
 After application running open new terminal and enter:
