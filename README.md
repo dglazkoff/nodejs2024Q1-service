@@ -19,9 +19,11 @@ npm install
 
 ## Running application
 
-Before running the application, you need to set up the environment variables.
+Before start application you need to install PostgresSQL and start it.
+Then set up the environment variables.
 Create a `.env` file in the root directory and fill it with the content from .env.example file.
 
+To start the application, enter the following command:
 ```
 npm start
 ```
@@ -29,6 +31,32 @@ npm start
 After starting the app on port (4000 as default) you can open
 in your browser OpenAPI documentation by typing http://localhost:4000/doc/.
 For more information about OpenAPI/Swagger please visit https://swagger.io/.
+
+## Running application in Docker
+
+Install Docker Desktop - [Download & Install Docker Desktop](https://www.docker.com/products/docker-desktop).
+
+To run the application in Docker, you need to enter the following command:
+
+```
+npm run docker:start
+```
+
+App is starting on port 4000. Be sure that port 5432 is free on your machine.
+
+To stop the application in Docker, you need to enter the following command:
+
+```
+npm run docker:stop
+```
+
+## Vulnerabilities scanning
+
+To scan the application for vulnerabilities, you need to enter the following command:
+
+```
+npm run docker:scan
+```
 
 ## Testing
 
@@ -73,3 +101,13 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+## Migration
+
+To generate a migration file to create all tables from scratch you should delete all tables from database and generate migration file using the following command:
+
+```
+npm run migrations:generate
+```
+
+Then using this command you can determine changes in schema and generate new migration file

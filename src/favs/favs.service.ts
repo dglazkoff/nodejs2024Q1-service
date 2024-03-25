@@ -1,41 +1,69 @@
 import { Injectable } from '@nestjs/common';
-import db from '../db/db';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { FavsAlbum } from './entities/favsAlbum.entity';
+import { FavsArtist } from './entities/favsArtist.entity';
+import { FavsTrack } from './entities/favsTrack.entity';
 
 @Injectable()
 export class FavsService {
-  getAlbums() {
-    return [...db.favs.albums];
+  constructor(
+    @InjectRepository(FavsAlbum)
+    private favsAlbumsRepository: Repository<FavsAlbum>,
+
+    @InjectRepository(FavsArtist)
+    private favsArtistRepository: Repository<FavsArtist>,
+
+    @InjectRepository(FavsTrack)
+    private favsTrackRepository: Repository<FavsTrack>,
+  ) {}
+  async getAlbums() {
+    return this.favsAlbumsRepository
+      .find()
+      .then((favsAlbums) => favsAlbums.flatMap((favsAlbum) => favsAlbum.album));
   }
 
-  getTracks() {
-    return [...db.favs.tracks];
+  async getTracks() {
+    return this.favsTrackRepository
+      .find()
+      .then((favsTracks) => favsTracks.flatMap((favsTrack) => favsTrack.track));
   }
 
-  getArtists() {
-    return [...db.favs.artists];
+  async getArtists() {
+    return this.favsArtistRepository
+      .find()
+      .then((favsArtists) =>
+        favsArtists.flatMap((favsArtist) => favsArtist.artist),
+      );
   }
 
-  createTrack(id: string) {
-    db.favs.tracks.add(id);
+  async createTrack(id: string) {
+    const favsTrack = this.favsTrackRepository.create({ track: id });
+
+    return this.favsTrackRepository.save(favsTrack);
   }
 
-  removeTrack(id: string) {
-    return db.favs.tracks.delete(id);
+  async removeTrack(id: string) {
+    return this.favsTrackRepository.delete({ track: id });
   }
 
-  createAlbum(id: string) {
-    db.favs.albums.add(id);
+  async createAlbum(id: string) {
+    const favsAlbum = this.favsAlbumsRepository.create({ album: id });
+
+    return this.favsAlbumsRepository.save(favsAlbum);
   }
 
-  removeAlbum(id: string) {
-    return db.favs.albums.delete(id);
+  async removeAlbum(id: string) {
+    return this.favsAlbumsRepository.delete({ album: id });
   }
 
-  createArtist(id: string) {
-    db.favs.artists.add(id);
+  async createArtist(id: string) {
+    const favsArtist = this.favsArtistRepository.create({ artist: id });
+
+    return this.favsArtistRepository.save(favsArtist);
   }
 
   removeArtist(id: string) {
-    return db.favs.artists.delete(id);
+    return this.favsArtistRepository.delete({ artist: id });
   }
 }

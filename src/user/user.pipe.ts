@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
-import { User } from '../interfaces/user';
 import { UserService } from './user.service';
+import { User } from './entity/user.entity';
 
 @Injectable()
-export class UserPipe implements PipeTransform<string, User> {
+export class UserPipe implements PipeTransform<string, Promise<User>> {
   constructor(private readonly userService: UserService) {}
 
-  transform(id: User['id']) {
-    const user = this.userService.findOne(id);
+  async transform(id: User['id']) {
+    const user = await this.userService.findOne(id);
 
     if (!user) {
       throw new NotFoundException(`No user with id ${id}`);

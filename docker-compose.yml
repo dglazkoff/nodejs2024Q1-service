@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: .
+#    command: sh -c "npm run start:dev"
+    ports:
+      - '${PORT}:${PORT}'
+    # это мы связываем локальную директорию с той, в которую будет скопировано приложение
+    networks:
+      - home-library
+    volumes:
+      - ./src:/usr/src/app/src
+    restart: always
+    environment:
+      PORT: ${PORT}
+      DB_PASSWORD: secret
+      POSTGRES_HOST: db
+      POSTGRES_USER: postgres
+      POSTGRES_DB: home-library
+    depends_on:
+      - db
+  db:
+    build:
+      context: .
+      dockerfile: Dockerfile.db
+    user: postgres
+    networks:
+      - home-library
+    # это куда данные будут сохраняться для того чтобы переиспользовать их при перезапуске контейнера
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - db-logs:/var/log/postgresql
+    restart: always
+    environment:
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: home-library
+
+networks:
+  home-library:
+
+volumes:
+  db-data:
+  db-logs:

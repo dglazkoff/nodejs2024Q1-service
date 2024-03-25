@@ -12,45 +12,43 @@ import {
   HttpStatus,
   HttpException,
   HttpCode,
+  UseInterceptors,
+  ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { UserPipe } from './user.pipe';
-import { User } from '../interfaces/user';
+import { User } from './entity/user.entity';
 
 @Controller('user')
+@UseInterceptors(ClassSerializerInterceptor)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Post()
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-    }),
-  )
+  @UsePipes(ValidationPipe)
   async create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.userService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe, UserPipe) user: User) {
+  async findOne(@Param('id', ParseUUIDPipe, UserPipe) user: User) {
     return user;
   }
 
   @Put(':id')
   @UsePipes(new ValidationPipe())
-  updatePassword(
+  async updatePassword(
     @Param('id', ParseUUIDPipe, UserPipe) user: User,
     @Body() updateUserPasswordDto: UpdateUserPasswordDto,
   ) {
-    const updatedUser = this.userService.updatePassword(
+    const updatedUser = await this.userService.updatePassword(
       user,
       updateUserPasswordDto,
     );
@@ -67,7 +65,7 @@ export class UserController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe, UserPipe) user: User) {
-    this.userService.remove(user.id);
+  async remove(@Param('id', ParseUUIDPipe, UserPipe) user: User) {
+    return this.userService.remove(user.id);
   }
 }

@@ -1,13 +1,13 @@
 import { Injectable, NotFoundException, PipeTransform } from '@nestjs/common';
-import { Track } from '../interfaces/track';
 import { TrackService } from './track.service';
+import { Track } from './entities/track.entity';
 
 @Injectable()
-export class TrackPipe implements PipeTransform<string, Track> {
+export class TrackPipe implements PipeTransform<string, Promise<Track>> {
   constructor(private readonly trackService: TrackService) {}
 
-  transform(id: Track['id']) {
-    const track = this.trackService.findOne(id);
+  async transform(id: Track['id']) {
+    const track = await this.trackService.findOne(id);
 
     if (!track) {
       throw new NotFoundException(`No track with id ${id}`);

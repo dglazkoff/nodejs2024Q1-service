@@ -16,36 +16,31 @@ import { TrackService } from './track.service';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackPipe } from './track.pipe';
-import { Track } from '../interfaces/track';
+import { Track } from './entities/track.entity';
 
 @Controller('track')
 export class TrackController {
   constructor(private readonly trackService: TrackService) {}
 
   @Post()
-  @UsePipes(
-    new ValidationPipe({
-      transform: true,
-      whitelist: true,
-    }),
-  )
-  create(@Body() createTrackDto: CreateTrackDto) {
+  @UsePipes(ValidationPipe)
+  async create(@Body() createTrackDto: CreateTrackDto) {
     return this.trackService.create(createTrackDto);
   }
 
   @Get()
-  findAll() {
+  async findAll() {
     return this.trackService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id', ParseUUIDPipe, TrackPipe) track: Track) {
+  async findOne(@Param('id', ParseUUIDPipe, TrackPipe) track: Track) {
     return track;
   }
 
   @Put(':id')
-  @UsePipes(new ValidationPipe())
-  update(
+  @UsePipes(ValidationPipe)
+  async update(
     @Param('id', ParseUUIDPipe, TrackPipe) track: Track,
     @Body() updateTrackDto: UpdateTrackDto,
   ) {
@@ -54,7 +49,7 @@ export class TrackController {
 
   @Delete(':id')
   @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param('id', ParseUUIDPipe, TrackPipe) track: Track) {
+  async remove(@Param('id', ParseUUIDPipe, TrackPipe) track: Track) {
     return this.trackService.remove(track);
   }
 }
