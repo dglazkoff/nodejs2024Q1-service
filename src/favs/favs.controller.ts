@@ -39,12 +39,6 @@ export class FavsController {
   @Delete('track/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeTrack(@Param('id', ParseUUIDPipe) id: string) {
-    // const isRemoved = this.favsService.removeTrack(id);
-    //
-    // if (!isRemoved) {
-    //   throw new HttpException('Track not found', HttpStatus.NOT_FOUND);
-    // }
-
     return this.favsService.removeTrack(id);
   }
 
@@ -63,12 +57,6 @@ export class FavsController {
   @Delete('album/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   async removeAlbum(@Param('id', ParseUUIDPipe) id: string) {
-    // const isRemoved = this.favsService.removeAlbum(id);
-    //
-    // if (!isRemoved) {
-    //   throw new HttpException('Album not found', HttpStatus.NOT_FOUND);
-    // }
-
     return this.favsService.removeAlbum(id);
   }
 
@@ -87,12 +75,6 @@ export class FavsController {
   @Delete('artist/:id')
   @HttpCode(HttpStatus.NO_CONTENT)
   removeArtist(@Param('id', ParseUUIDPipe) id: string) {
-    // const isRemoved = this.favsService.removeArtist(id);
-    //
-    // if (!isRemoved) {
-    //   throw new HttpException('Artist not found', HttpStatus.NOT_FOUND);
-    // }
-
     return this.favsService.removeArtist(id);
   }
 }

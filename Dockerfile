@@ -14,6 +14,6 @@ FROM node:20-alpine
 WORKDIR /usr/src/app
 
 COPY . .
-COPY --from=base /usr/src/app/node_modules /usr/src/app/node_modules
+COPY --from=base /usr/src/app/node_modules ./node_modules
 
-CMD npm run start:dev
+CMD npm run start:migrations:dev

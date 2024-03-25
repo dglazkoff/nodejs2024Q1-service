@@ -5,6 +5,7 @@ import { ArtistModule } from './artist/artist.module';
 import { AlbumModule } from './album/album.module';
 import { FavsModule } from './favs/favs.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 import 'dotenv/config';
 
@@ -17,17 +18,18 @@ console.log(process.env.POSTGRES_HOST);
     ArtistModule,
     AlbumModule,
     FavsModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.POSTGRES_HOST,
-      port: 5432,
-      username: process.env.POSTGRES_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.POSTGRES_DB,
-      //  shouldn't be used in production
-      synchronize: true,
-      // logging: true,
-      autoLoadEntities: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.get('POSTGRES_HOST'),
+        port: 5432,
+        username: configService.get('POSTGRES_USER'),
+        password: configService.get('DB_PASSWORD'),
+        database: configService.get('POSTGRES_DB'),
+        autoLoadEntities: true,
+      }),
     }),
   ],
 })

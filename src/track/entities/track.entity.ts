@@ -27,7 +27,7 @@ export class Track {
   @OneToOne(() => Album, {
     onDelete: 'SET NULL',
   })
-  // для миграции можно попробовать протестить убирать это поле
+  // для тестирования миграции можно убрать это поле и выполнить команду migrations:generate
   @JoinColumn({ name: 'albumId' })
   albumId: string | null; // refers to Album
 

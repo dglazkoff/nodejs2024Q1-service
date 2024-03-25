@@ -93,3 +93,13 @@ npm run format
 Press <kbd>F5</kbd> to debug.
 
 For more information, visit: https://code.visualstudio.com/docs/editor/debugging
+
+## Migration
+
+To generate a migration file to create all tables from scratch you should delete all tables from database and generate migration file using the following command:
+
+```
+npm run migrations:generate
+```
+
+Then using this command you can determine changes in schema and generate new migration file
